@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer-array name="icons_cat">
+        <item>1</item>
+        <item>2</item>
+        <item>2</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>2</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>2</item>
+        <item>1</item>
+        <item>2</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>2</item>
+    </integer-array>
+
+    <array name="icons_drawable">
+        <item>ic_001_book</item>
+        <item>ic_002_bonus</item>
+        <item>ic_003_sale</item>
+        <item>ic_004_cloth</item>
+        <item>ic_005_coffee</item>
+        <item>ic_006_credit_card</item>
+        <item>ic_007_drink</item>
+        <item>ic_008_electricity</item>
+        <item>ic_009_leisure</item>
+        <item>ic_010_fast_food</item>
+        <item>ic_011_rental</item>
+        <item>ic_012_food</item>
+        <item>ic_013_fruit</item>
+        <item>ic_014_gas</item>
+        <item>ic_015_gift</item>
+        <item>ic_016_groceries</item>
+        <item>ic_017_gym</item>
+        <item>ic_018_painting</item>
+        <item>ic_019_income</item>
+        <item>ic_020_insurance</item>
+        <item>ic_021_investment</item>
+        <item>ic_022_laundry</item>
+        <item>ic_023_magazine</item>
+        <item>ic_024_medical</item>
+        <item>ic_025_mortgage</item>
+        <item>ic_026_movie</item>
+        <item>ic_027_music</item>
+        <item>ic_028_parking</item>
+        <item>ic_029_transportation</item>
+        <item>ic_030_salon</item>
+        <item>ic_031_shopping</item>
+        <item>ic_032_snack</item>
+        <item>ic_033_massage</item>
+        <item>ic_034_toy</item>
+        <item>ic_035_travel</item>
+        <item>ic_036_allowance</item>
+    </array>
+
+
+    <array name="icons_name">
+        <item>book</item>
+        <item>bonus</item>
+        <item>sale</item>
+        <item>cloth</item>
+        <item>coffee</item>
+        <item>credit card</item>
+        <item>drink</item>
+        <item>electricity</item>
+        <item>leisure</item>
+        <item>fast food</item>
+        <item>rental</item>
+        <item>food</item>
+        <item>fruit</item>
+        <item>gas</item>
+        <item>gift</item>
+        <item>groceries</item>
+        <item>gym</item>
+        <item>painting</item>
+        <item>income</item>
+        <item>insurance</item>
+        <item>investment</item>
+        <item>laundry</item>
+        <item>magazine</item>
+        <item>medical</item>
+        <item>mortgage</item>
+        <item>movie</item>
+        <item>music</item>
+        <item>parking</item>
+        <item>transportation</item>
+        <item>salon</item>
+        <item>shopping</item>
+        <item>snack</item>
+        <item>massage</item>
+        <item>toy</item>
+        <item>travel</item>
+        <item>allowance</item>
+    </array>
+
+</resources>

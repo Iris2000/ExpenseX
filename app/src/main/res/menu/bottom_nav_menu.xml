@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_trans"
+        android:enabled="true"
+        android:title="Trans"
+        android:icon="@drawable/ic_trans"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_budget"
+        android:enabled="true"
+        android:title="Budget"
+        android:icon="@drawable/ic_budget"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_cat"
+        android:enabled="true"
+        android:title="Cat"
+        android:icon="@drawable/ic_cat"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_chart"
+        android:enabled="true"
+        android:title="Chart"
+        android:icon="@drawable/ic_pie_chart"
+        app:showAsAction="ifRoom"/>
+</menu>
