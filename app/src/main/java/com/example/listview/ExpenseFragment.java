@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,8 +32,9 @@ public class ExpenseFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        super.onCreate(savedInstanceState);
         String username = getArguments().getString("username");
+//        Log.d("username", username);
         db = new DatabaseHelper(getActivity());
         expenseCats = db.getIconAndName(username, "expense");
         icon_name = new String[expenseCats.size()];
@@ -60,5 +62,18 @@ public class ExpenseFragment extends Fragment {
         });
         return view;
     }
+
+//    @Override
+//    public void onSaveInstanceState(Bundle savedInstanceState) {
+//        super.onSaveInstanceState(savedInstanceState);
+//        // Save UI state changes to the savedInstanceState.
+//        // This bundle will be passed to onCreate if the process is
+//        // killed and restarted.
+//        savedInstanceState.putBoolean("MyBoolean", true);
+//        savedInstanceState.putDouble("myDouble", 1.9);
+//        savedInstanceState.putInt("MyInt", 1);
+//        savedInstanceState.putString("MyString", "Welcome back to Android");
+//        // etc.
+//    }
 
 }

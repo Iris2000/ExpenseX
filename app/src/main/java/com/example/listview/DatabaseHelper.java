@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -213,12 +214,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<CatClass> getIconAndName (String username, String type) {
         ArrayList<CatClass> catArrayList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
+//        Log.d("username", username);
+//        Log.d("type", type);
         // get user_id
         Cursor cursor = db.rawQuery("Select id from user where username = ?", new String[]{username});
         if (cursor.moveToFirst()) {
             user_id = cursor.getString(0);
         }
         cursor.close();
+//        Log.d("user_id", user_id);
 
         if (type == "expense") {
             final String MY_QUERY = "SELECT * FROM category a INNER JOIN user_cat b ON a.id=b.cat_id WHERE b.user_id=? AND a.icon_cat_id=1";
