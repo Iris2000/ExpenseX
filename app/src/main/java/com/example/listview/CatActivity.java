@@ -1,23 +1,34 @@
 package com.example.listview;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+
 public class CatActivity extends AppCompatActivity {
+
     private TabLayout tabLayout;
     private ViewPager viewPager;
     String username;
     int position;
+    DatabaseHelper db;
+    MyAdapter adapter;
+    String type;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,11 +38,6 @@ public class CatActivity extends AppCompatActivity {
         Intent getIntent = getIntent();
         username = getIntent.getStringExtra("username");
 
-        if (savedInstanceState != null) {
-            Log.d("hello","hi");
-            username = savedInstanceState.getString("username");
-        }
-
         tabLayout=(TabLayout)findViewById(R.id.tabLayout);
         viewPager=(ViewPager)findViewById(R.id.viewPager);
 
@@ -39,7 +45,7 @@ public class CatActivity extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setText("Income"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 //        Log.d("username", username);
-        MyAdapter adapter = new MyAdapter(this, getSupportFragmentManager(), tabLayout.getTabCount(), username);
+        adapter = new MyAdapter(this, getSupportFragmentManager(), tabLayout.getTabCount(), username, "hi");
         viewPager.setAdapter(adapter);
 
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -65,22 +71,14 @@ public class CatActivity extends AppCompatActivity {
     public void OnAddButtonClicked(View view) {
         Intent intent = new Intent(this, AddCategory.class);
         if (position == 0) {
-            intent.putExtra("name", "Expense");
+            type = "Expense";
         } else if (position == 1) {
-            intent.putExtra("name", "Income");
+            type = "Income";
         }
+        intent.putExtra("name", type);
         intent.putExtra("username", username);
         startActivityForResult(intent, 2);
     }
-
-//    @Override
-//    public void onSaveInstanceState(Bundle outState) {
-//        Log.d("hi", "here");
-//        outState.putString("username", username);
-//
-//        // call superclass to save any view hierarchy
-//        super.onSaveInstanceState(outState);
-//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
@@ -90,6 +88,17 @@ public class CatActivity extends AppCompatActivity {
         if(requestCode == 2)
         {
             username = data.getStringExtra("username");
+            String drawableName = data.getStringExtra("drawableName");
+            String catName = data.getStringExtra("catName");
+            if (drawableName != "" && catName != "") {
+                Log.d("drawableName", drawableName);
+                Log.d("catName", catName);
+                db = new DatabaseHelper(this);
+                Boolean saveCat = db.saveCategory(drawableName, catName, username, position);
+                if (!saveCat) {
+                    Toast.makeText(this, "failed", Toast.LENGTH_SHORT).show();
+                }
+            }
         }
     }
 }

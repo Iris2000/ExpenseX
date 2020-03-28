@@ -13,18 +13,21 @@ class MyAdapter extends FragmentPagerAdapter {
     Context context;
     int totalTabs;
     String username;
+    String test;
 
-    public MyAdapter(Context c, FragmentManager fm, int totalTabs, String username) {
+    public MyAdapter(Context c, FragmentManager fm, int totalTabs, String username, String test) {
         super(fm);
         context = c;
         this.totalTabs = totalTabs;
         this.username = username;
+        this.test = test;
     }
 
     @Override
     public Fragment getItem(int position) {
         Bundle bundle = new Bundle();
         bundle.putString("username", username);
+
         switch (position) {
             case 0:
                 ExpenseFragment expenseFragment = new ExpenseFragment();

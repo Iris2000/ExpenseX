@@ -9,6 +9,7 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -16,6 +17,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private Context context;
     String user_id;
+    String cat_id;
 
     public DatabaseHelper(Context context) {
         super(context, "Login.db", null, 1);
@@ -266,5 +268,68 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cursor2.close();
         }
         return catArrayList;
+    }
+    // checking if category name exists;
+    public Boolean checkCatName (String username, String catName) {
+        SQLiteDatabase dbRead = this.getReadableDatabase();
+        // get user_id
+        Cursor cursor2 = dbRead.rawQuery("Select id from user where username = ?", new String[]{username});
+        if (cursor2.moveToFirst()) {
+            user_id = cursor2.getString(0);
+        }
+        cursor2.close();
+        Log.d("user_id", user_id);
+        Log.d("cat_name", catName);
+        final String MY_QUERY = "SELECT * FROM category a INNER JOIN user_cat b ON a.id=b.cat_id WHERE b.user_id=? AND a.cat_name=?";
+        Cursor cursor = dbRead.rawQuery(MY_QUERY, new String[]{user_id, catName});
+        if (cursor.getCount() > 0)
+            return true;
+        else
+            return false;
+    }
+    // save new category
+    public boolean saveCategory (String drawableName, String catName, String username, int position) {
+        SQLiteDatabase dbWrite = this.getWritableDatabase();
+        SQLiteDatabase dbRead = this.getReadableDatabase();
+        long ins1=0;
+        long ins2;
+
+        // check if same cat_name and cat_icon exist in the table
+        Cursor cursor1 = dbRead.rawQuery("Select * from category where cat_name = ? and cat_icon = ?", new String[]{catName, drawableName});
+        if (cursor1.moveToFirst()) {
+            Log.d("info", "same category exist");
+        } else {
+            // save data to category table
+            ContentValues categoryTable = new ContentValues();
+            categoryTable.put("cat_name", catName);
+            categoryTable.put("cat_icon", drawableName);
+            categoryTable.put("icon_cat_id", position+1);
+            ins1 = dbWrite.insert("category", null, categoryTable);
+        }
+        cursor1.close();
+        // get user_id
+        Cursor cursor2 = dbRead.rawQuery("Select id from user where username = ?", new String[]{username});
+        if (cursor2.moveToFirst()) {
+            user_id = cursor2.getString(0);
+        }
+        cursor2.close();
+//        Log.d("user_id", user_id);
+        // get cat_id
+        Cursor cursor3 = dbRead.rawQuery("Select id from category where cat_name = ?", new String[]{catName});
+        if (cursor3.moveToFirst()) {
+            cat_id = cursor3.getString(0);
+        }
+        cursor3.close();
+//        Log.d("cat_id", cat_id);
+
+        ContentValues userCatTable = new ContentValues();
+        userCatTable.put("user_id", user_id);
+        userCatTable.put("cat_id", cat_id);
+        ins2 = dbWrite.insert("user_cat", null, userCatTable);
+
+        if (ins1 == -1 || ins2 == -1)
+            return false;
+        else
+            return true;
     }
 }
