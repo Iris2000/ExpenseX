@@ -118,4 +118,9 @@
         <item>allowance</item>
     </array>
 
+    <array name="category">
+        <item>Add Expense</item>
+        <item>Add Income</item>
+    </array>
+
 </resources>

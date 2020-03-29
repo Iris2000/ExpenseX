@@ -18,7 +18,9 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.Calendar;
@@ -47,10 +49,17 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        sp = getSharedPreferences("login", MODE_PRIVATE);
+        username = sp.getString("username", "");
+        String email = sp.getString("email", "");
+        Bundle bundle = new Bundle();
+        bundle.putString("username", username);
+        TransFragment tf = new TransFragment();
+        tf.setArguments(bundle);
+        final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         // keep the selected fragment when rotating the device
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                    new TransFragment()).commit();
+            ft.replace(R.id.fragment_container, tf).commit();
         }
 
         // get current month and year
@@ -79,9 +88,6 @@ public class MainActivity extends AppCompatActivity implements
         // get username and email
         mUsername = header.findViewById(R.id.username);
         mUserEmail = header.findViewById(R.id.userEmail);
-        sp = getSharedPreferences("login", MODE_PRIVATE);
-        username = sp.getString("username", "");
-        String email = sp.getString("email", "");
         mUsername.setText(username);
         mUserEmail.setText(email);
     }
