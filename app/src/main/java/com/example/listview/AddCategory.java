@@ -55,6 +55,8 @@ public class AddCategory extends AppCompatActivity {
         intent.putExtra("username", username);
         switch (item.getItemId()) {
             case android.R.id.home:
+                intent.putExtra("drawableName", "");
+                intent.putExtra("catName", "");
                 setResult(2, intent);
                 finish();//finishing activity
                 return true;

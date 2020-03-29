@@ -122,58 +122,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return true;
     }
-
-    // inserting in cat table
-    public void insertCatTable() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        DatabaseUtils.InsertHelper ih = new DatabaseUtils.InsertHelper(db, "category");
-//        ContentValues contentValues = new ContentValues();
-        final int catName = ih.getColumnIndex("cat_name");
-        final int catIcon = ih.getColumnIndex("cat_icon");
-        final int iconCatId = ih.getColumnIndex("icon_cat_id");
-
-        Resources res = this.context.getResources();
-        TypedArray iconsDrawable = res.obtainTypedArray(R.array.icons_drawable);
-        TypedArray iconsName = res.obtainTypedArray(R.array.icons_name);
-        TypedArray iconsCat = res.obtainTypedArray(R.array.icons_cat);
-        String iconDrawable;
-        String iconName;
-        long ins = -1;
-        int iconCat;
-
-        for (int i = 0; i < 36; i++) {
-            ih.prepareForInsert();
-            iconDrawable = iconsDrawable.getString(i);
-            iconName = iconsName.getString(i);
-            iconCat = iconsCat.getInt(i, 0);
-
-            ih.bind(catName, iconName);
-            ih.bind(catIcon, iconDrawable);
-            ih.bind(iconCatId, iconCat);
-            ih.execute();
-//            Bitmap bitmap = ((BitmapDrawable)iconDrawable).getBitmap();
-//            int width = bitmap.getWidth();
-//            int height = bitmap.getHeight();
-//            int size = bitmap.getRowBytes() * height;
-//            java.nio.ByteBuffer byteBuffer = ByteBuffer.allocate(size);
-//            bitmap.copyPixelsToBuffer(byteBuffer);
-//            byte byteArray[] = byteBuffer.array();
-//            bitmap.recycle();
-//            contentValues.put("cat_name", iconName);
-//            contentValues.put("cat_icon", iconDrawable);
-//            contentValues.put("icon_cat_id", iconCat);
-//            ins = db.insertWithOnConflict("category", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
-//            iconsDrawable.recycle();
-//            iconsName.recycle();
-//            iconsCat.recycle();
-        }
-//        db.close();
-//        if (ins == -1)
-//            return false;
-//        else
-//            return true;
-    }
-
     // checking if email exists;
     public Boolean checkMail (String email) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -331,5 +279,47 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return false;
         else
             return true;
+    }
+
+    // get username if login successfully;
+    public boolean deleteItem (String type, int position, String username) {
+        SQLiteDatabase dbRead = this.getWritableDatabase();
+        SQLiteDatabase dbWrite = this.getWritableDatabase();
+        int count = 0;
+
+        if (type == "expense") {
+            type = "1";
+        } else if (type == "income") {
+            type = "2";
+        }
+        // get user_id
+        Cursor cursor2 = dbRead.rawQuery("Select id from user where username = ?", new String[]{username});
+        if (cursor2.moveToFirst()) {
+            user_id = cursor2.getString(0);
+        }
+        cursor2.close();
+
+        Log.d("type", type);
+        Log.d("position", Integer.toString(position));
+        Log.d("user_id", user_id);
+        final String MY_QUERY = "SELECT * FROM user_cat a INNER JOIN category b ON b.id=a.cat_id WHERE a.user_id=? AND b.icon_cat_id=?";
+        Cursor cursor = dbRead.rawQuery(MY_QUERY, new String[]{user_id, type});
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                count++;
+                if (count == position) {
+                    int user_cat_id = cursor.getInt(0);
+                    Log.d("user_cat_id", Integer.toString(user_cat_id));
+                    dbWrite.delete("user_cat", "id" + "=?", new String[]{String.valueOf(user_cat_id)});
+                    cursor.close();
+                    return true;
+                }
+                cursor.moveToNext();
+            }
+        } else {
+            return false;
+        }
+        return true;
     }
 }

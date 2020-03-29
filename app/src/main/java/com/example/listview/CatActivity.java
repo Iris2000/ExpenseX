@@ -90,7 +90,7 @@ public class CatActivity extends AppCompatActivity {
             username = data.getStringExtra("username");
             String drawableName = data.getStringExtra("drawableName");
             String catName = data.getStringExtra("catName");
-            if (drawableName != "" && catName != "") {
+            if (!drawableName.equals("") && !catName.equals("")) {
                 Log.d("drawableName", drawableName);
                 Log.d("catName", catName);
                 db = new DatabaseHelper(this);

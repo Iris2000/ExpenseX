@@ -4,16 +4,17 @@ package com.example.listview;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -23,8 +24,10 @@ public class ExpenseFragment extends Fragment {
 
     DatabaseHelper db;
     ArrayList<CatClass> expenseCats = new ArrayList<>();
-    String[] icon_name;
-    int[] icon_image;
+//    String[] icon_name;
+//    int[] icon_image;
+    ArrayList<String> icon_name = new ArrayList<>();
+    ArrayList<Integer> icon_image = new ArrayList<>();
     String username;
     ListView lv;
 
@@ -39,27 +42,27 @@ public class ExpenseFragment extends Fragment {
 //        Log.d("username", username);
         db = new DatabaseHelper(getActivity());
         expenseCats = db.getIconAndName(username, "expense");
-        icon_name = new String[expenseCats.size()];
-        icon_image = new int[expenseCats.size()];
+//        icon_name = new String[expenseCats.size()];
+//        icon_image = new int[expenseCats.size()];
         for (int i = 0; i < expenseCats.size(); i ++) {
-            icon_name[i] = expenseCats.get(i).getCatName();
+//            icon_name[i] = expenseCats.get(i).getCatName();
             String image = expenseCats.get(i).getCatIcon();
             int image_id = getResources().getIdentifier(image, "drawable", getActivity().getPackageName());
-            icon_image[i] = image_id;
+//            icon_image[i] = image_id;
+            icon_name.add(expenseCats.get(i).getCatName());
+            icon_image.add(image_id);
 //            Log.d("image_id", String.valueOf(image_id));
         }
 //        Log.d("catIcon", expenseCats.get(29).getCatName());
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_cat, container, false);
-
-        lv= (ListView) view.findViewById(R.id.list);
-        ListAdapter adapter = new ListAdapter(this.getActivity(),icon_name,icon_image);
+        lv = (ListView) view.findViewById(R.id.list);
+        ListAdapter adapter = new ListAdapter(this.getActivity(),icon_name,icon_image, "expense", username);
+        adapter.notifyDataSetChanged();
         lv.setAdapter(adapter);
-
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             }
         });
         return view;
@@ -68,17 +71,23 @@ public class ExpenseFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        icon_name.clear();
+        icon_image.clear();
         db = new DatabaseHelper(getActivity());
         expenseCats = db.getIconAndName(username, "expense");
-        icon_name = new String[expenseCats.size()];
-        icon_image = new int[expenseCats.size()];
+//        icon_name = new String[expenseCats.size()];
+//        icon_image = new int[expenseCats.size()];
         for (int i = 0; i < expenseCats.size(); i ++) {
-            icon_name[i] = expenseCats.get(i).getCatName();
+//            icon_name[i] = expenseCats.get(i).getCatName();
             String image = expenseCats.get(i).getCatIcon();
             int image_id = getResources().getIdentifier(image, "drawable", getActivity().getPackageName());
-            icon_image[i] = image_id;
+//            icon_image[i] = image_id;
+            icon_name.add(expenseCats.get(i).getCatName());
+            icon_image.add(image_id);
         }
-        ListAdapter adapter = new ListAdapter(this.getActivity(),icon_name,icon_image);
+        ListAdapter adapter = new ListAdapter(this.getActivity(),icon_name,icon_image, "expense", username);
+        adapter.notifyDataSetChanged();
         lv.setAdapter(adapter);
     }
+
 }
