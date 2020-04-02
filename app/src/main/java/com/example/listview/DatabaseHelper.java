@@ -39,8 +39,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                          "icon_cat_id int not null," +
                                          "foreign key(icon_cat_id) references icon_category(id))");
         db.execSQL("Create table if not exists user_cat(id integer primary key autoincrement," +
-                                         "user_id integer," +
-                                         "cat_id integer," +
+                                         "user_id integer not null," +
+                                         "cat_id integer not null," +
+                                         "foreign key(user_id) references user(id)," +
+                                         "foreign key(cat_id) references category(id))");
+        db.execSQL("Create table if not exists record(id integer primary key autoincrement," +
+                                         "user_id integer not null," +
+                                         "cat_id integer not null," +
+                                         "memo text," +
+                                         "total double not null," +
+                                         "year int not null," +
+                                         "month int not null," +
+                                         "day int not null," +
+                                         "type text not null," +
                                          "foreign key(user_id) references user(id)," +
                                          "foreign key(cat_id) references category(id))");
 
@@ -164,15 +175,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<CatClass> getIconAndName (String username, String type) {
         ArrayList<CatClass> catArrayList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-//        Log.d("username", username);
-//        Log.d("type", type);
+
         // get user_id
         Cursor cursor = db.rawQuery("Select id from user where username = ?", new String[]{username});
         if (cursor.moveToFirst()) {
             user_id = cursor.getString(0);
         }
         cursor.close();
-//        Log.d("user_id", user_id);
 
         if (type == "expense") {
             final String MY_QUERY = "SELECT * FROM category a INNER JOIN user_cat b ON a.id=b.cat_id WHERE b.user_id=? AND a.icon_cat_id=1";
@@ -321,5 +330,190 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return false;
         }
         return true;
+    }
+
+    public boolean saveRecord(String username, String drawableName, String iconName, String memo,
+                                double total, int year, int month, int day, String type) {
+        SQLiteDatabase dbRead = this.getReadableDatabase();
+        SQLiteDatabase dbWrite = this.getWritableDatabase();
+        Log.d("selected", type);
+        long ins;
+        // get user_id
+        Cursor cursor = dbRead.rawQuery("Select id from user where username = ?", new String[]{username});
+        if (cursor.moveToFirst()) {
+            user_id = cursor.getString(0);
+        }
+        cursor.close();
+        // get cat_id
+        Cursor cursor2 = dbRead.rawQuery("Select id from category where cat_name = ? and cat_icon = ?", new String[]{iconName, drawableName});
+        if (cursor2.moveToFirst()) {
+            cat_id = cursor2.getString(0);
+        }
+        cursor2.close();
+//        Log.d ("user_id", user_id);
+//        Log.d("cat_id", cat_id);
+
+        // save data into record table
+        ContentValues recordTable = new ContentValues();
+        recordTable.put("user_id", user_id);
+        recordTable.put("cat_id", cat_id);
+        recordTable.put("memo", memo);
+        recordTable.put("total", total);
+        recordTable.put("year", year);
+        recordTable.put("month", month);
+        recordTable.put("day", day);
+        recordTable.put("type", type);
+
+        ins = dbWrite.insert("record", null, recordTable);
+        if (ins == -1) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public ArrayList<RecordClass> getRecord(String username, int year, int month) {
+        ArrayList<RecordClass> recordList = new ArrayList<>();
+        String yearString = Integer.toString(year);
+        String monthString = Integer.toString(month);
+        SQLiteDatabase dbRead = this.getReadableDatabase();
+        Cursor cursor = dbRead.rawQuery("Select id from user where username = ?", new String[]{username});
+        if (cursor.moveToFirst()) {
+            user_id = cursor.getString(0);
+        }
+        cursor.close();
+
+        // get record
+        Cursor cursor3 = dbRead.rawQuery("Select * from record where user_id = ? and year = ? and month = ? order by day desc", new String[]{user_id, yearString, monthString});
+        if (cursor3.getCount() > 0) {
+            cursor3.moveToFirst();
+            while(!cursor3.isAfterLast()) {
+                String catId = cursor3.getString(2);
+                String memo = cursor3.getString(3);
+                Double total = cursor3.getDouble(4);
+                int displayYear = cursor3.getInt(5);
+                int displayMonth = cursor3.getInt(6);
+                int displayDay = cursor3.getInt(7);
+                String type = cursor3.getString(8);
+                RecordClass record = new RecordClass();
+                record.setMemo(memo);
+                record.setTotal(total);
+                record.setYear(displayYear);
+                record.setMonth(displayMonth);
+                record.setDay(displayDay);
+                record.setType(type);
+//                Log.d("memo", memo);
+//                Log.d("total", Double.toString(total));
+//                Log.d("year", Integer.toString(displayYear));
+//                Log.d("month", Integer.toString(displayMonth));
+//                Log.d("day", Integer.toString(displayDay));
+//                Log.d("type", type);
+                // get catIcon and catName
+                String MY_QUERY = "SELECT * FROM category a INNER JOIN record b ON a.id=b.cat_id WHERE b.user_id=? and b.cat_id=?";
+                Cursor cursor2 = dbRead.rawQuery(MY_QUERY, new String[]{user_id, catId});
+                if (cursor2.moveToFirst()) {
+                    String catName = cursor2.getString(1);
+                    String catIcon = cursor2.getString(2);
+                    int image_id = this.context.getResources().getIdentifier(catIcon, "drawable", this.context.getApplicationContext().getPackageName());
+                    record.setCatName(catName);
+                    record.setCatIcon(image_id);
+//                    Log.d("catName", catName);
+//                    Log.d("catIcon", catIcon);
+                }
+                cursor2.close();
+                recordList.add(record);
+                cursor3.moveToNext();
+            }
+        }
+        cursor3.close();
+        return recordList;
+    }
+
+    public ArrayList<IncomeExpenseClass> getIncomeExpense(String username, String month, int year) {
+        ArrayList<IncomeExpenseClass> incomeExpense = new ArrayList<>();
+        SQLiteDatabase dbRead = this.getReadableDatabase();
+        String selectedYear = Integer.toString(year);
+        String selectedMonth = "0";
+        double expense = 0;
+        double income = 0;
+        double balance = 0;
+        Cursor cursor = dbRead.rawQuery("Select id from user where username = ?", new String[]{username});
+        if (cursor.moveToFirst()) {
+            user_id = cursor.getString(0);
+        }
+        cursor.close();
+
+        switch(month) {
+            case "JAN":
+                selectedMonth = "1";
+                break;
+            case "FEB":
+                selectedMonth = "2";
+                break;
+            case "MAR":
+                selectedMonth = "3";
+                break;
+            case "APR":
+                selectedMonth = "4";
+                break;
+            case "MAY":
+                selectedMonth = "5";
+                break;
+            case "JUN":
+                selectedMonth = "6";
+                break;
+            case "JUL":
+                selectedMonth = "7";
+                break;
+            case "AUG":
+                selectedMonth = "8";
+                break;
+            case "SEP":
+                selectedMonth = "9";
+                break;
+            case "OCT":
+                selectedMonth = "10";
+                break;
+            case "NOV":
+                selectedMonth = "11";
+                break;
+            case "DEC":
+                selectedMonth = "12";
+                break;
+            default:
+                break;
+        }
+
+        Cursor cursor2 = dbRead.rawQuery("Select total from record where user_id=? and type=? and month=? and year=?", new String[]{user_id, "expense", selectedMonth, selectedYear});
+        if (cursor2.getCount() > 0) {
+            cursor2.moveToFirst();
+            while(!cursor2.isAfterLast()) {
+                expense += cursor2.getDouble(0);
+                cursor2.moveToNext();
+            }
+        }
+        cursor2.close();
+
+        Cursor cursor3 = dbRead.rawQuery("Select total from record where user_id=? and type=? and month=? and year=?", new String[]{user_id, "income", selectedMonth, selectedYear});
+        if (cursor3.getCount() > 0) {
+            cursor3.moveToFirst();
+            while(!cursor3.isAfterLast()) {
+                income += cursor3.getDouble(0);
+                cursor3.moveToNext();
+            }
+        }
+        cursor3.close();
+
+        balance = income - expense;
+
+        IncomeExpenseClass record = new IncomeExpenseClass();
+        record.setExpense(expense);
+        record.setIncome(income);
+        record.setBalance(balance);
+        incomeExpense.add(record);
+        Log.d("expense", Double.toString(record.getExpense()));
+        Log.d("income", Double.toString(record.getIncome()));
+        Log.d("balance", Double.toString(record.getBalance()));
+        return incomeExpense;
     }
 }

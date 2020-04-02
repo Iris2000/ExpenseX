@@ -24,8 +24,6 @@ public class ExpenseFragment extends Fragment {
 
     DatabaseHelper db;
     ArrayList<CatClass> expenseCats = new ArrayList<>();
-//    String[] icon_name;
-//    int[] icon_image;
     ArrayList<String> icon_name = new ArrayList<>();
     ArrayList<Integer> icon_image = new ArrayList<>();
     String username;
@@ -42,18 +40,15 @@ public class ExpenseFragment extends Fragment {
 //        Log.d("username", username);
         db = new DatabaseHelper(getActivity());
         expenseCats = db.getIconAndName(username, "expense");
-//        icon_name = new String[expenseCats.size()];
-//        icon_image = new int[expenseCats.size()];
+
         for (int i = 0; i < expenseCats.size(); i ++) {
-//            icon_name[i] = expenseCats.get(i).getCatName();
             String image = expenseCats.get(i).getCatIcon();
             int image_id = getResources().getIdentifier(image, "drawable", getActivity().getPackageName());
-//            icon_image[i] = image_id;
             icon_name.add(expenseCats.get(i).getCatName());
             icon_image.add(image_id);
-//            Log.d("image_id", String.valueOf(image_id));
         }
 //        Log.d("catIcon", expenseCats.get(29).getCatName());
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_cat, container, false);
         lv = (ListView) view.findViewById(R.id.list);
@@ -75,13 +70,9 @@ public class ExpenseFragment extends Fragment {
         icon_image.clear();
         db = new DatabaseHelper(getActivity());
         expenseCats = db.getIconAndName(username, "expense");
-//        icon_name = new String[expenseCats.size()];
-//        icon_image = new int[expenseCats.size()];
         for (int i = 0; i < expenseCats.size(); i ++) {
-//            icon_name[i] = expenseCats.get(i).getCatName();
             String image = expenseCats.get(i).getCatIcon();
             int image_id = getResources().getIdentifier(image, "drawable", getActivity().getPackageName());
-//            icon_image[i] = image_id;
             icon_name.add(expenseCats.get(i).getCatName());
             icon_image.add(image_id);
         }

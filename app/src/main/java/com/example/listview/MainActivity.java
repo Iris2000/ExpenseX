@@ -1,6 +1,7 @@
 package com.example.listview;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -17,12 +18,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 
@@ -34,6 +37,9 @@ public class MainActivity extends AppCompatActivity implements
     Toolbar mToolbar;
     TextView mUsername;
     TextView mUserEmail;
+    TextView mIncome;
+    TextView mExpense;
+    TextView mBalance;
     SharedPreferences sp;
     private TextView mDate;
     private String month;
@@ -43,6 +49,11 @@ public class MainActivity extends AppCompatActivity implements
     private ToggleButton checkedBtn = null;
     private String[] monthName;
     String username;
+    DatabaseHelper db;
+    ArrayList<IncomeExpenseClass> incomeExpense;
+    double income = 0;
+    double expense = 0;
+    double balance = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,12 +101,46 @@ public class MainActivity extends AppCompatActivity implements
         mUserEmail = header.findViewById(R.id.userEmail);
         mUsername.setText(username);
         mUserEmail.setText(email);
+
+//        // set income, balance, and expense
+//        db = new DatabaseHelper(this);
+//        incomeExpense = db.getIncomeExpense(username, month, year);
+//        expense = incomeExpense.get(0).getExpense();
+//        income = incomeExpense.get(0).getIncome();
+//        balance = incomeExpense.get(0).getBalance();
+//        mExpense = findViewById(R.id.expenseTextVIew);
+//        mIncome = findViewById(R.id.incomeTextView);
+//        mBalance = findViewById(R.id.balanceTextView);
+//        mExpense.setText("RM" + Double.toString(expense));
+//        mIncome.setText("RM" + Double.toString(income));
+//        mBalance.setText("RM" + Double.toString(balance));
+//        if (balance < 0) {
+//            mBalance.setTextColor(ContextCompat.getColor(this, R.color.expense));
+//        } else {
+//            mBalance.setTextColor(ContextCompat.getColor(this, R.color.income));
+//        }
+        setIncomeBalance();
     }
 
     public void showDatePicker(View view) {
         toggleBtn = new ToggleButton[12];
 
         chooseDate = new Dialog(this);
+        chooseDate.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                Bundle bundle = new Bundle();
+                bundle.putString("username", username);
+                bundle.putString("month", month);
+                bundle.putInt("year", year);
+                TransFragment tf = new TransFragment();
+                tf.setArguments(bundle);
+                final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                // keep the selected fragment when rotating the device
+                ft.replace(R.id.fragment_container, tf).commit();
+
+            }
+        });
         chooseDate.setContentView(R.layout.activity_choose_date);
 
         toggleBtn[0] = chooseDate.findViewById(R.id.toggleButton1);
@@ -166,6 +211,36 @@ public class MainActivity extends AppCompatActivity implements
         mDate = findViewById(R.id.date);
         String text = month + " " + year;
         mDate.setText(text);
+        Bundle bundle = new Bundle();
+        bundle.putString("username", username);
+        bundle.putString("month", month);
+        bundle.putInt("year", year);
+        TransFragment tf = new TransFragment();
+        tf.setArguments(bundle);
+        final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, tf).commit();
+        setIncomeBalance();
+
+    }
+
+    public void setIncomeBalance() {
+        // set income, balance, and expense
+        db = new DatabaseHelper(this);
+        incomeExpense = db.getIncomeExpense(username, month, year);
+        expense = incomeExpense.get(0).getExpense();
+        income = incomeExpense.get(0).getIncome();
+        balance = incomeExpense.get(0).getBalance();
+        mExpense = findViewById(R.id.expenseTextVIew);
+        mIncome = findViewById(R.id.incomeTextView);
+        mBalance = findViewById(R.id.balanceTextView);
+        mExpense.setText("RM" + Double.toString(expense));
+        mIncome.setText("RM" + Double.toString(income));
+        mBalance.setText("RM" + Double.toString(balance));
+        if (balance < 0) {
+            mBalance.setTextColor(ContextCompat.getColor(this, R.color.expense));
+        } else {
+            mBalance.setTextColor(ContextCompat.getColor(this, R.color.income));
+        }
     }
 
     @Override
