@@ -43,4 +43,6 @@
     <string name="nov">NOV</string>
     <string name="dec">DEC</string>
     <string name="add_a_new_category">+ Add a new category</string>
+    <string name="ok_button">Delete</string>
+    <string name="cancel_button">Cancel</string>
 </resources>

@@ -14,7 +14,6 @@ public class GridAdapter extends BaseAdapter {
     int[] icon_image;
     View view;
     LayoutInflater layoutInflater;
-    int count = 0;
 
     public GridAdapter(Context context, String[] icon_name, int[] icon_image) {
         this.context = context;

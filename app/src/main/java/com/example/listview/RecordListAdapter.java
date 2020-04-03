@@ -1,40 +1,30 @@
 package com.example.listview;
 
 import android.content.Context;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
-import org.w3c.dom.Text;
-
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class RecordListAdapter extends BaseAdapter {
 
     Context context;
-//    String icon_name, icon_image, type;
-//    double total;
-//    int month, day;
     ArrayList<RecordClass> recordList;
+    DecimalFormat df;
 
     public RecordListAdapter(Context context, ArrayList<RecordClass> recordList) {
-        //super(context, R.layout.single_list_app_item, utilsArrayList);
         this.context = context;
         this.recordList = recordList;
-//        this.icon_name = icon_name;
-//        this.icon_image = icon_image;
-//        this.type = type;
-//        this.total = total;
-//        this.month = month;
-//        this.day = day;
     }
 
     @Override
@@ -54,8 +44,10 @@ public class RecordListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
+        notifyDataSetChanged();
         ViewHolder viewHolder;
+        df = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+        df.setMaximumFractionDigits(340); //340 = DecimalFormat.DOUBLE_FRACTION_DIGITS
 
         if (convertView == null) {
             viewHolder = new ViewHolder();
@@ -75,10 +67,11 @@ public class RecordListAdapter extends BaseAdapter {
                         recordList.get(position).getYear();
         String type = recordList.get(position).getType();
         viewHolder.icon.setImageResource(recordList.get(position).getCatIcon());
+        viewHolder.icon.setTag(recordList.get(position).getRecordId());
         viewHolder.name.setText(recordList.get(position).getCatName());
         viewHolder.memo.setText(recordList.get(position).getMemo());
         viewHolder.date.setText(date);
-        viewHolder.total.setText(Double.toString(recordList.get(position).getTotal()));
+        viewHolder.total.setText("RM" + df.format(recordList.get(position).getTotal()));
         if (type.equals("expense")) {
             viewHolder.total.setTextColor(ContextCompat.getColor(context, R.color.expense));
         } else {
@@ -86,7 +79,6 @@ public class RecordListAdapter extends BaseAdapter {
         }
         return convertView;
     }
-
 
     private static class ViewHolder {
         ImageButton icon;

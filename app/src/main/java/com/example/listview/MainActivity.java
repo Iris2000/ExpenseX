@@ -22,11 +22,13 @@ import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity implements
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements
     double income = 0;
     double expense = 0;
     double balance = 0;
+    DecimalFormat df;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,10 +71,14 @@ public class MainActivity extends AppCompatActivity implements
         TransFragment tf = new TransFragment();
         tf.setArguments(bundle);
         final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        // keep the selected fragment when rotating the device
+
         if (savedInstanceState == null) {
             ft.replace(R.id.fragment_container, tf).commit();
         }
+
+        // set decimal format
+        df = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+        df.setMaximumFractionDigits(340); //340 = DecimalFormat.DOUBLE_FRACTION_DIGITS
 
         // get current month and year
         Calendar calendar = Calendar.getInstance();
@@ -102,23 +109,6 @@ public class MainActivity extends AppCompatActivity implements
         mUsername.setText(username);
         mUserEmail.setText(email);
 
-//        // set income, balance, and expense
-//        db = new DatabaseHelper(this);
-//        incomeExpense = db.getIncomeExpense(username, month, year);
-//        expense = incomeExpense.get(0).getExpense();
-//        income = incomeExpense.get(0).getIncome();
-//        balance = incomeExpense.get(0).getBalance();
-//        mExpense = findViewById(R.id.expenseTextVIew);
-//        mIncome = findViewById(R.id.incomeTextView);
-//        mBalance = findViewById(R.id.balanceTextView);
-//        mExpense.setText("RM" + Double.toString(expense));
-//        mIncome.setText("RM" + Double.toString(income));
-//        mBalance.setText("RM" + Double.toString(balance));
-//        if (balance < 0) {
-//            mBalance.setTextColor(ContextCompat.getColor(this, R.color.expense));
-//        } else {
-//            mBalance.setTextColor(ContextCompat.getColor(this, R.color.income));
-//        }
         setIncomeBalance();
     }
 
@@ -138,7 +128,6 @@ public class MainActivity extends AppCompatActivity implements
                 final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 // keep the selected fragment when rotating the device
                 ft.replace(R.id.fragment_container, tf).commit();
-
             }
         });
         chooseDate.setContentView(R.layout.activity_choose_date);
@@ -233,9 +222,9 @@ public class MainActivity extends AppCompatActivity implements
         mExpense = findViewById(R.id.expenseTextVIew);
         mIncome = findViewById(R.id.incomeTextView);
         mBalance = findViewById(R.id.balanceTextView);
-        mExpense.setText("RM" + Double.toString(expense));
-        mIncome.setText("RM" + Double.toString(income));
-        mBalance.setText("RM" + Double.toString(balance));
+        mExpense.setText("RM" + df.format(expense));
+        mIncome.setText("RM" + df.format(income));
+        mBalance.setText("RM" + df.format(balance));
         if (balance < 0) {
             mBalance.setTextColor(ContextCompat.getColor(this, R.color.expense));
         } else {
@@ -247,6 +236,12 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
+            case R.id.chart:
+                Toast.makeText(getApplicationContext(), "Chart", Toast.LENGTH_SHORT).show();
+                intent = new Intent(this, PieChart.class);
+                intent.putExtra("username", username);
+                startActivity(intent);
+                break;
             case R.id.cat:
                 Toast.makeText(getApplicationContext(), "Category", Toast.LENGTH_SHORT).show();
                 intent = new Intent(this, CatActivity.class);
@@ -261,5 +256,11 @@ public class MainActivity extends AppCompatActivity implements
                 break;
         }
         return true;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setIncomeBalance();
     }
 }

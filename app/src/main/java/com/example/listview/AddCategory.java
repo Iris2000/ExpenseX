@@ -6,15 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
-
-import java.util.ArrayList;
 
 public class AddCategory extends AppCompatActivity {
 
@@ -86,6 +83,5 @@ public class AddCategory extends AppCompatActivity {
         mIconButton.setImageDrawable(getDrawable);
 
         drawableName = view.getResources().getResourceEntryName(view.getId());
-//        Toast.makeText(this,drawableName, Toast.LENGTH_SHORT).show();
     }
 }

@@ -9,6 +9,15 @@ public class RecordClass {
     private int month;
     private int day;
     private String type;
+    private int recordId;
+
+    public int getRecordId() {
+        return recordId;
+    }
+
+    public void setRecordId(int recordId) {
+        this.recordId = recordId;
+    }
 
     public String getCatName() {
         return catName;

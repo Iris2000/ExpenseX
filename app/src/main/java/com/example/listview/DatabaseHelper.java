@@ -9,7 +9,8 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.widget.Toast;
+
+import com.github.mikephil.charting.data.PieEntry;
 
 import java.util.ArrayList;
 
@@ -71,7 +72,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         TypedArray iconsCat = res.obtainTypedArray(R.array.icons_cat);
         String iconDrawable;
         String iconName;
-        long ins = -1;
         int iconCat;
 
         for (int i = 0; i < 36; i++) {
@@ -270,14 +270,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             user_id = cursor2.getString(0);
         }
         cursor2.close();
-//        Log.d("user_id", user_id);
+
         // get cat_id
         Cursor cursor3 = dbRead.rawQuery("Select id from category where cat_name = ?", new String[]{catName});
         if (cursor3.moveToFirst()) {
             cat_id = cursor3.getString(0);
         }
         cursor3.close();
-//        Log.d("cat_id", cat_id);
 
         ContentValues userCatTable = new ContentValues();
         userCatTable.put("user_id", user_id);
@@ -290,7 +289,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return true;
     }
 
-    // get username if login successfully;
     public boolean deleteItem (String type, int position, String username) {
         SQLiteDatabase dbRead = this.getWritableDatabase();
         SQLiteDatabase dbWrite = this.getWritableDatabase();
@@ -388,6 +386,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor3.getCount() > 0) {
             cursor3.moveToFirst();
             while(!cursor3.isAfterLast()) {
+                int recordId = cursor3.getInt(0);
                 String catId = cursor3.getString(2);
                 String memo = cursor3.getString(3);
                 Double total = cursor3.getDouble(4);
@@ -396,6 +395,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 int displayDay = cursor3.getInt(7);
                 String type = cursor3.getString(8);
                 RecordClass record = new RecordClass();
+                record.setRecordId(recordId);
                 record.setMemo(memo);
                 record.setTotal(total);
                 record.setYear(displayYear);
@@ -433,7 +433,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<IncomeExpenseClass> incomeExpense = new ArrayList<>();
         SQLiteDatabase dbRead = this.getReadableDatabase();
         String selectedYear = Integer.toString(year);
-        String selectedMonth = "0";
+        String selectedMonth = "1";
         double expense = 0;
         double income = 0;
         double balance = 0;
@@ -515,5 +515,187 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d("income", Double.toString(record.getIncome()));
         Log.d("balance", Double.toString(record.getBalance()));
         return incomeExpense;
+    }
+
+    public ArrayList<PieEntry> getChartData2(String username, String month, int year, String type) {
+        ArrayList<PieEntry> dataEntries = new ArrayList<>();
+        String selectedMonth = "1";
+        String[] catName;
+        float[] value;
+        int c = 0;
+        String cat_id;
+        boolean found = false;
+        String stringYear = Integer.toString(year);
+        SQLiteDatabase dbRead = this.getReadableDatabase();
+        Cursor cursor = dbRead.rawQuery("Select id from user where username = ?", new String[]{username});
+        if (cursor.moveToFirst()) {
+            user_id = cursor.getString(0);
+        }
+        cursor.close();
+
+        switch(month) {
+            case "JAN":
+                selectedMonth = "1";
+                break;
+            case "FEB":
+                selectedMonth = "2";
+                break;
+            case "MAR":
+                selectedMonth = "3";
+                break;
+            case "APR":
+                selectedMonth = "4";
+                break;
+            case "MAY":
+                selectedMonth = "5";
+                break;
+            case "JUN":
+                selectedMonth = "6";
+                break;
+            case "JUL":
+                selectedMonth = "7";
+                break;
+            case "AUG":
+                selectedMonth = "8";
+                break;
+            case "SEP":
+                selectedMonth = "9";
+                break;
+            case "OCT":
+                selectedMonth = "10";
+                break;
+            case "NOV":
+                selectedMonth = "11";
+                break;
+            case "DEC":
+                selectedMonth = "12";
+                break;
+            default:
+                break;
+        }
+
+//        Log.d("selectedMonth", selectedMonth);
+        // get category name and expenses
+        String MY_QUERY = "SELECT * FROM category a INNER JOIN record b ON a.id=b.cat_id WHERE b.user_id=? and b.type=? and b.year=? and b.month=?";
+        Cursor cursor2 = dbRead.rawQuery(MY_QUERY, new String[]{user_id, type, stringYear, selectedMonth});
+        if (cursor2.getCount() > 0) {
+            catName = new String[cursor2.getCount()];
+            value = new float[cursor2.getCount()];
+            cursor2.moveToFirst();
+            while(!cursor2.isAfterLast()) {
+                float total = 0;
+                for (int i = 0; i < catName.length; i++) {
+                    if (cursor2.getString(1).equals(catName[i])) {
+                        found = true;
+                    }
+                }
+                if (!found) {
+                    cat_id = cursor2.getString(0);
+                    catName[c] = cursor2.getString(1);
+                    Cursor cursor3 = dbRead.rawQuery("Select total from record where user_id=? and type=? and month=? and year=? and cat_id=?",
+                            new String[]{user_id, type, selectedMonth, stringYear, cat_id});
+                    if (cursor3.getCount() > 0) {
+                        cursor3.moveToFirst();
+                        while (!cursor3.isAfterLast()) {
+                            total += cursor3.getDouble(0);
+                            cursor3.moveToNext();
+                        }
+                    }
+                    cursor3.close();
+                    value[c] = total;
+                    cursor2.moveToNext();
+                    dataEntries.add(new PieEntry(value[c], catName[c]));
+                    Log.d("catId", cat_id);
+                    Log.d("catName", catName[c]);
+                    Log.d("total", Double.toString(value[c]));
+                    c++;
+                } else {
+                    cursor2.moveToNext();
+                }
+            }
+            cursor2.close();
+        } else {
+            dataEntries.clear();
+//            Log.d("clear", "clear");
+        }
+        return dataEntries;
+    }
+
+    public Double getTotalValue(String username, String month, int year, String type) {
+        Double total = 0.0;
+        String selectedMonth = "1";
+        String selectedYear = Integer.toString(year);
+        SQLiteDatabase dbRead = this.getReadableDatabase();
+        Cursor cursor = dbRead.rawQuery("Select id from user where username = ?", new String[]{username});
+        if (cursor.moveToFirst()) {
+            user_id = cursor.getString(0);
+        }
+        cursor.close();
+
+        switch(month) {
+            case "JAN":
+                selectedMonth = "1";
+                break;
+            case "FEB":
+                selectedMonth = "2";
+                break;
+            case "MAR":
+                selectedMonth = "3";
+                break;
+            case "APR":
+                selectedMonth = "4";
+                break;
+            case "MAY":
+                selectedMonth = "5";
+                break;
+            case "JUN":
+                selectedMonth = "6";
+                break;
+            case "JUL":
+                selectedMonth = "7";
+                break;
+            case "AUG":
+                selectedMonth = "8";
+                break;
+            case "SEP":
+                selectedMonth = "9";
+                break;
+            case "OCT":
+                selectedMonth = "10";
+                break;
+            case "NOV":
+                selectedMonth = "11";
+                break;
+            case "DEC":
+                selectedMonth = "12";
+                break;
+            default:
+                break;
+        }
+
+        Cursor cursor2 = dbRead.rawQuery("Select total from record where user_id=? and type=? and month=? and year=?", new String[]{user_id, type, selectedMonth, selectedYear});
+        if (cursor2.getCount() > 0) {
+            cursor2.moveToFirst();
+            while(!cursor2.isAfterLast()) {
+                total += cursor2.getDouble(0);
+                cursor2.moveToNext();
+            }
+        }
+        cursor2.close();
+
+        return total;
+    }
+
+    public void deleteRecord(int tag) {
+        SQLiteDatabase dbRead = this.getWritableDatabase();
+        SQLiteDatabase dbWrite = this.getWritableDatabase();
+        String stringTag = Integer.toString(tag);
+
+        final String MY_QUERY = "SELECT * FROM record WHERE id=?";
+        Cursor cursor = dbRead.rawQuery(MY_QUERY, new String[]{stringTag});
+        if (cursor.moveToFirst()) {
+            dbWrite.delete("record", "id" + "=?", new String[]{String.valueOf(stringTag)});
+        }
+        cursor.close();
     }
 }

@@ -21,16 +21,10 @@ public class IncomeFragment extends Fragment {
 
     DatabaseHelper db;
     ArrayList<CatClass> incomeCats = new ArrayList<>();
-//    String[] icon_name;
-//    int[] icon_image;
     ArrayList<String> icon_name = new ArrayList<>();
     ArrayList<Integer> icon_image = new ArrayList<>();
     String username;
     ListView lv;
-
-    public IncomeFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,16 +32,11 @@ public class IncomeFragment extends Fragment {
         username = getArguments().getString("username");
         db = new DatabaseHelper(getActivity());
         incomeCats = db.getIconAndName(username, "income");
-//        icon_name = new String[incomeCats.size()];
-//        icon_image = new int[incomeCats.size()];
         for (int i = 0; i < incomeCats.size(); i ++) {
-//            icon_name[i] = incomeCats.get(i).getCatName();
             String image = incomeCats.get(i).getCatIcon();
             int image_id = getResources().getIdentifier(image, "drawable", getActivity().getPackageName());
-//            icon_image[i] = image_id;
             icon_name.add(incomeCats.get(i).getCatName());
             icon_image.add(image_id);
-//            Log.d("image_id", String.valueOf(image_id));
         }
 //        Log.d("catIcon", expenseCats.get(29).getCatName());
 
@@ -76,13 +65,9 @@ public class IncomeFragment extends Fragment {
         username = getArguments().getString("username");
         db = new DatabaseHelper(getActivity());
         incomeCats = db.getIconAndName(username, "income");
-//        icon_name = new String[incomeCats.size()];
-//        icon_image = new int[incomeCats.size()];
         for (int i = 0; i < incomeCats.size(); i ++) {
-//            icon_name[i] = incomeCats.get(i).getCatName();
             String image = incomeCats.get(i).getCatIcon();
             int image_id = getResources().getIdentifier(image, "drawable", getActivity().getPackageName());
-//            icon_image[i] = image_id;
             icon_name.add(incomeCats.get(i).getCatName());
             icon_image.add(image_id);
         }

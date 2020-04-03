@@ -123,4 +123,9 @@
         <item>Add Income</item>
     </array>
 
+    <array name="chart">
+        <item>Expense Chart</item>
+        <item>Income Chart</item>
+    </array>
+
 </resources>

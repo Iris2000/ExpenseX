@@ -29,10 +29,6 @@ public class ExpenseFragment extends Fragment {
     String username;
     ListView lv;
 
-    public ExpenseFragment() {
-        // Required empty public constructor
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

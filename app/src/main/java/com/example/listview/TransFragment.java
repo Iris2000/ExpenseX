@@ -1,7 +1,6 @@
 package com.example.listview;
 
-
-import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,14 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
@@ -35,6 +33,9 @@ public class TransFragment extends Fragment {
     String clickedMonth;
     int clickedYear;
     int selectedMonth;
+    Button mAdd;
+    RecordListAdapter adapter;
+
     ArrayList<RecordClass> recordList = new ArrayList<>();
 
     @Override
@@ -101,17 +102,52 @@ public class TransFragment extends Fragment {
         // Inflate the layout for this fragment
         transView = inflater.inflate(R.layout.fragment_trans, container, false);
         lv = transView.findViewById(R.id.list_view);
-        RecordListAdapter adapter = new RecordListAdapter(this.getActivity(), recordList);
+        adapter = new RecordListAdapter(this.getActivity(), recordList);
         adapter.notifyDataSetChanged();
+        lv.setLongClickable(true);
         lv.setAdapter(adapter);
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                final int listPosition = position;
+                ImageButton btn = view.findViewById(R.id.icon);
+                final int tag = (Integer) btn.getTag();
+                Log.d("tag", Integer.toString(tag));
+                AlertDialog.Builder myAlertBuilder = new AlertDialog.Builder(getActivity());
+                // Set the dialog title and message.
+                myAlertBuilder.setTitle("Confirm Delete");
+                myAlertBuilder.setMessage("Are you sure you want to delete this?");
+                // Add the dialog buttons.
+                myAlertBuilder.setPositiveButton(getString(R.string.ok_button), new
+                        DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // User clicked Delete button.
+                                Toast.makeText(getContext(), "delete", Toast.LENGTH_SHORT).show();
+                                db.deleteRecord(tag);
+                                recordList.remove(listPosition);
+                                adapter = new RecordListAdapter(getActivity(), recordList);
+                                adapter.notifyDataSetChanged();
+                                lv.setLongClickable(true);
+                                lv.setAdapter(adapter);
+                            }
+                        });
+                myAlertBuilder.setNegativeButton(getString(R.string.cancel_button), new
+                        DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // User cancelled the dialog.
+                                Toast.makeText(getContext(), "cancel",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                // Create and show the AlertDialog;
+                myAlertBuilder.show();
+                return false;
             }
         });
 
-        FloatingActionButton fab = transView.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mAdd = transView.findViewById(R.id.add_button);
+        mAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 addRecord();
