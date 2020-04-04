@@ -28,7 +28,7 @@ public class SignIn extends AppCompatActivity {
         mTextPwd = findViewById(R.id.passwordSignIn);
         mBtnSignIn = findViewById(R.id.signInBtn);
         sp = getSharedPreferences("login", MODE_PRIVATE);
-        if (sp.getBoolean("logged", true)) {
+        if (sp.getBoolean("logged", false)) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         }
@@ -65,6 +65,8 @@ public class SignIn extends AppCompatActivity {
                     sp.edit().putString("email", email).apply();
 
                     Intent intent = new Intent(this, MainActivity.class);
+//                    intent.putExtra("username", username);
+//                    intent.putExtra("email", email);
                     startActivity(intent);
                 }
             }

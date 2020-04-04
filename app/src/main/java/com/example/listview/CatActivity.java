@@ -45,7 +45,7 @@ public class CatActivity extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setText("Income"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 //        Log.d("username", username);
-        adapter = new MyAdapter(this, getSupportFragmentManager(), tabLayout.getTabCount(), username, "hi");
+        adapter = new MyAdapter(this, getSupportFragmentManager(), tabLayout.getTabCount(), username);
         viewPager.setAdapter(adapter);
 
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));

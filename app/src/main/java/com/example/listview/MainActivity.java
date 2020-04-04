@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -66,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements
         sp = getSharedPreferences("login", MODE_PRIVATE);
         username = sp.getString("username", "");
         String email = sp.getString("email", "");
+//        Intent getIntent = getIntent();
+//        username = getIntent.getStringExtra("username");
+//        String email = getIntent.getStringExtra("email");
         Bundle bundle = new Bundle();
         bundle.putString("username", username);
         TransFragment tf = new TransFragment();
@@ -126,7 +130,6 @@ public class MainActivity extends AppCompatActivity implements
                 TransFragment tf = new TransFragment();
                 tf.setArguments(bundle);
                 final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                // keep the selected fragment when rotating the device
                 ft.replace(R.id.fragment_container, tf).commit();
             }
         });
@@ -215,6 +218,9 @@ public class MainActivity extends AppCompatActivity implements
     public void setIncomeBalance() {
         // set income, balance, and expense
         db = new DatabaseHelper(this);
+        Log.d("username", username);
+        Log.d("month", month);
+        Log.d("year", Integer.toString(year));
         incomeExpense = db.getIncomeExpense(username, month, year);
         expense = incomeExpense.get(0).getExpense();
         income = incomeExpense.get(0).getIncome();

@@ -13,14 +13,12 @@ class MyAdapter extends FragmentPagerAdapter {
     Context context;
     int totalTabs;
     String username;
-    String test;
 
-    public MyAdapter(Context c, FragmentManager fm, int totalTabs, String username, String test) {
+    public MyAdapter(Context c, FragmentManager fm, int totalTabs, String username) {
         super(fm);
         context = c;
         this.totalTabs = totalTabs;
         this.username = username;
-        this.test = test;
     }
 
     @Override
