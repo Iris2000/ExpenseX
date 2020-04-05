@@ -325,9 +325,12 @@ public class AddRecord extends AppCompatActivity {
                     if (textViewTotal.equals("")) {
                         Toast.makeText(getApplicationContext(),"Please enter the amount", Toast.LENGTH_SHORT).show();
                     } else {
+                        if (textViewTotal.contains("+") || textViewTotal.contains("-") || textViewTotal.contains(".")) {
+                            textViewTotal = textViewTotal.substring(0, textViewTotal.length() - 1);
+                        }
                         memo = mMemo.getText().toString();
                         iconName = icon_name[id];
-                        total = Double.parseDouble(mTotal.getText().toString());
+                        total = Double.parseDouble(textViewTotal);
 //                        Log.d("iconName", iconName);
 //                        Log.d("memo", memo);
 //                        Log.d("drawableName", drawableName);

@@ -113,7 +113,7 @@ public class TransFragment extends Fragment {
                 final int listPosition = position;
                 ImageButton btn = view.findViewById(R.id.icon);
                 final int tag = (Integer) btn.getTag();
-                Log.d("tag", Integer.toString(tag));
+//                Log.d("tag", Integer.toString(tag));
                 AlertDialog.Builder myAlertBuilder = new AlertDialog.Builder(getActivity());
                 // Set the dialog title and message.
                 myAlertBuilder.setTitle("Confirm Delete");

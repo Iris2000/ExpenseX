@@ -67,9 +67,6 @@ public class MainActivity extends AppCompatActivity implements
         sp = getSharedPreferences("login", MODE_PRIVATE);
         username = sp.getString("username", "");
         String email = sp.getString("email", "");
-//        Intent getIntent = getIntent();
-//        username = getIntent.getStringExtra("username");
-//        String email = getIntent.getStringExtra("email");
         Bundle bundle = new Bundle();
         bundle.putString("username", username);
         TransFragment tf = new TransFragment();

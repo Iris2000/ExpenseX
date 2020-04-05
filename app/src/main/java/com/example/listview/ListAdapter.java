@@ -1,6 +1,7 @@
 package com.example.listview;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 
 import java.util.ArrayList;
 
@@ -63,17 +67,39 @@ public class ListAdapter extends BaseAdapter {
             viewHolder.deleteBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d("delete", "button clicked");
-                    View parentRow = (View) v.getParent();
-                    ListView lv = (ListView) parentRow.getParent();
-                    final int position = lv.getPositionForView(parentRow);
-//                    Log.d("position", Integer.toString(position));
-                    Boolean deleteItem = db.deleteItem(type, position+1, username);
-                    if (deleteItem) {
-                        icon_name.remove(position);
-                        icon_image.remove(position);
-                        notifyDataSetChanged();
-                    }
+                    final View view = v;
+//                    Log.d("delete", "button clicked");
+                    AlertDialog.Builder myAlertBuilder = new AlertDialog.Builder(context);
+                    // Set the dialog title and message.
+                    myAlertBuilder.setTitle("Confirm Delete");
+                    myAlertBuilder.setMessage("Are you sure you want to delete this?");
+                    // Add the dialog buttons.
+                    myAlertBuilder.setPositiveButton(R.string.ok_button, new
+                            DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // User clicked Delete button.
+                                    View parentRow = (View) view.getParent();
+                                    ListView lv = (ListView) parentRow.getParent();
+                                    final int position = lv.getPositionForView(parentRow);
+//                                  Log.d("position", Integer.toString(position));
+                                    Boolean deleteItem = db.deleteItem(type, position+1, username);
+                                    if (deleteItem) {
+                                        icon_name.remove(position);
+                                        icon_image.remove(position);
+                                        notifyDataSetChanged();
+                                    }
+                                }
+                            });
+                    myAlertBuilder.setNegativeButton(R.string.cancel_button, new
+                            DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // User cancelled the dialog.
+                                    Toast.makeText(context, "cancel",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                    // Create and show the AlertDialog;
+                    myAlertBuilder.show();
                 }
             });
             convertView.setTag(viewHolder);
